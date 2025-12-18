@@ -1,0 +1,11 @@
+package com.nexthorizon.churnInsight_api.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class ChurnPredictionResponse {
+    private Boolean previsao;
+    private Double probabilidade;
+}
