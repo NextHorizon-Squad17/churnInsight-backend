@@ -7,9 +7,11 @@ import com.nexthorizon.churnInsight_api.dto.RegisterUserRequest;
 import com.nexthorizon.churnInsight_api.dto.RegisterUserResponse;
 import com.nexthorizon.churnInsight_api.entity.User;
 import com.nexthorizon.churnInsight_api.repository.UserRepository;
+import com.nexthorizon.churnInsight_api.service.UserAuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,50 +25,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final TokenConfig tokenConfig;
+    private final UserAuthService userAuthService;
 
     public AuthController(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            AuthenticationManager authenticationManager,
-            TokenConfig tokenConfig
+            UserAuthService userAuthService
     ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.tokenConfig = tokenConfig;
+        this.userAuthService = userAuthService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                request.email(),
-                request.password()
-        );
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
-        User user = (User) authentication.getPrincipal();
-        String token = tokenConfig.generateToken(user);
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(userAuthService.login(request));
     }
 
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
-        User newUser = new User();
-        newUser.setName(request.name());
-        newUser.setEmail(request.email());
-        newUser.setPassword(passwordEncoder.encode(request.password()));
-
-        userRepository.save(newUser);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(new RegisterUserResponse(
-                newUser.getName(),
-                newUser.getEmail()
-        ));
-
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(userAuthService.register(request));
     }
 
 }
