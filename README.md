@@ -14,36 +14,124 @@ Este projeto faz parte do MVP do ChurnInsight, desenvolvido durante um hackathon
 # ⚠️ Neste estágio, a previsão é mockada.
 A integração com o modelo de Data Science será feita em uma etapa posterior.
 
-🛠️ Tecnologias
+# 🛠️ Tecnologias
 
 * Java 17+
-
 * Spring Boot
-
 * Spring Web
-
 * Bean Validation (Jakarta Validation)
-
 * Maven
+* Docker
+* Docker Compose
 
 # 🚀 Como executar o projeto
-Pré-requisitos
+
+## Pré-requisitos
+
+### Execução local
 
 * Java 25 ou superior
-
 * Maven 4.0+
 
-# Executar localmente
+### Execução com Docker
+
+* Docker
+* Docker Compose
+
+---
+
+## 🐳 Executando o projeto com Docker (recomendado)
+
+### 1️⃣ Clonar o repositório
+
 ```bash
-  mvn spring-boot:run
+git clone <url-do-repositorio>
+cd churninsight-backend
 ```
 
+---
+
+### 2️⃣ Configurar variáveis de ambiente
+
+O projeto utiliza variáveis de ambiente para configuração de **perfil**, **JWT**, **banco de dados** e **bootstrap do usuário administrador**.
+
+Copie o arquivo de exemplo:
+
+```bash
+cp .env-example .env
 ```
-A aplicação será iniciada em: localhost:8080
+
+Edite o arquivo `.env` conforme necessário:
+
+```env
+SPRING_PROFILE_ACTIVE=dev
+
+SECURITY_JWT_SECRET=dev-secret-123
+JWT_EXPIRATION_SECONDS=3600
+
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=churn_insight_db
+DB_USER=user123
+DB_PASSWORD=pass123
+
+BOOTSTRAP_ADMIN_EMAIL=admin@local.dev
+BOOTSTRAP_ADMIN_PASSWORD=admin123
+BOOTSTRAP_ADMIN_NAME=Administrator
 ```
+
+### 🔐 Bootstrap de usuário administrador
+
+- Quando a aplicação é iniciada **pela primeira vez**
+- E **não existem usuários cadastrados no banco**
+- Um usuário administrador será criado automaticamente usando as variáveis acima
+
+> ⚠️ Em produção, recomenda-se:
+> - Utilizar senhas fortes
+> - Armazenar segredos em um cofre (AWS Secrets Manager, Vault, etc)
+> - Desabilitar o bootstrap após o primeiro deploy
+
+---
+
+### 3️⃣ Subir a aplicação
+
+```bash
+docker compose up --build
+```
+
+A aplicação irá:
+- Subir o banco PostgreSQL
+- Executar as migrations (Flyway)
+- Iniciar a API Spring Boot
+- Criar o usuário administrador (se necessário)
+
+A API ficará disponível em:
+
+```
+http://localhost:8080
+```
+
+---
+
+## ▶️ Executando localmente (sem Docker)
+
+```bash
+mvn spring-boot:run
+```
+
+A aplicação será iniciada em:
+
+```
+http://localhost:8080
+```
+
+> ⚠️ Para execução local sem Docker, é necessário configurar manualmente as variáveis de ambiente e um banco PostgreSQL acessível.
+
+---
 
 # 📡 Endpoint disponível
-POST /predict
+
+## POST /predict
 
 Recebe dados de um cliente e retorna a previsão de churn.
 
