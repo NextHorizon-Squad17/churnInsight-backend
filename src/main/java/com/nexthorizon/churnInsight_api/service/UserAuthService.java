@@ -1,17 +1,16 @@
 package com.nexthorizon.churnInsight_api.service;
 
 import com.nexthorizon.churnInsight_api.config.TokenConfig;
-import com.nexthorizon.churnInsight_api.dto.LoginRequest;
-import com.nexthorizon.churnInsight_api.dto.LoginResponse;
-import com.nexthorizon.churnInsight_api.dto.RegisterUserRequest;
-import com.nexthorizon.churnInsight_api.dto.RegisterUserResponse;
+import com.nexthorizon.churnInsight_api.dto.*;
 import com.nexthorizon.churnInsight_api.entity.User;
 import com.nexthorizon.churnInsight_api.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserAuthService {
@@ -61,5 +60,26 @@ public class UserAuthService {
                 newUser.getName(),
                 newUser.getEmail()
         );
+    }
+
+    @Transactional
+    public void updateUser(String username, UpdateUserRequest request) {
+        // 1. Busca como UserDetails
+        UserDetails userDetails = userRepository.findUserByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        // 2. Faz o CAST para a sua classe User
+        // Isso "avisa" ao Java que este UserDetails é, na verdade, um User do banco
+        User user = (User) userDetails;
+
+        // 3. Atualiza os campos (agora os métodos setName/setPassword ficam visíveis)
+        user.setName(request.name());
+
+        if (request.password() != null && !request.password().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.password()));
+        }
+
+        // 4. Salva no banco
+        userRepository.save(user);
     }
 }
