@@ -1,7 +1,32 @@
 services:
   api:
-    image: churn-insight-api:latest
-    env_file:
-      - .env.prod
+    image: ghcr.io/raiuri/churn-insight-api:latest
+    container_name: churn-insight-api
+    restart: always
     ports:
-      - "8080:8080"
+      - "80:8080"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18
+    container_name: churn-insight-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
