@@ -32,22 +32,21 @@ jobs:
           docker build -t ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/churn-insight-api:latest .
           docker push ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/churn-insight-api:latest
 
-      - name: Copy docker-compose.prod.yml to OCI
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.OCI_HOST }}
-          username: ${{ secrets.OCI_USER }}
-          key: ${{ secrets.OCI_SSH_KEY }}
-          source: "docker-compose.prod.yml"
-          target: "/opt/churn-insight"
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.OCI_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.OCI_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy docker-compose.prod.yml
+        run: |
+          scp docker-compose.prod.yml opc@${{ secrets.OCI_HOST }}:/opt/churn-insight/docker-compose.prod.yml
 
       - name: Deploy on OCI
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.OCI_HOST }}
-          username: ${{ secrets.OCI_USER }}
-          key: ${{ secrets.OCI_SSH_KEY }}
-          script: |
+        run: |
+          ssh opc@${{ secrets.OCI_HOST }} << 'EOF'
             cd /opt/churn-insight
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose pull
+            docker compose up -d
+          EOF
