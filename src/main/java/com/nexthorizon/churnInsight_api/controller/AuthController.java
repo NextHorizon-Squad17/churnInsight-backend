@@ -1,4 +1,5 @@
 package com.nexthorizon.churnInsight_api.controller;
+
 import com.nexthorizon.churnInsight_api.dto.LoginRequest;
 import com.nexthorizon.churnInsight_api.dto.LoginResponse;
 import com.nexthorizon.churnInsight_api.dto.RegisterUserRequest;
@@ -17,25 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserAuthService userAuthService;
+  private final UserAuthService userAuthService;
 
-    public AuthController(
-            UserAuthService userAuthService
-    ) {
-        this.userAuthService = userAuthService;
-    }
+  public AuthController(UserAuthService userAuthService) {
+    this.userAuthService = userAuthService;
+  }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(userAuthService.login(request));
-    }
+  @PostMapping("/login")
+  public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    return ResponseEntity.ok(userAuthService.login(request));
+  }
 
-    @PostMapping("/register")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(userAuthService.register(request));
-    }
-
+  @PostMapping("/register")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<RegisterUserResponse> register(
+      @Valid @RequestBody RegisterUserRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(userAuthService.register(request));
+  }
 }

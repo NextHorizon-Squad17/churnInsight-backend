@@ -16,50 +16,43 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserAuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final TokenConfig tokenConfig;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final AuthenticationManager authenticationManager;
+  private final TokenConfig tokenConfig;
 
-    public UserAuthService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            AuthenticationManager authenticationManager,
-            TokenConfig tokenConfig
-    ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.tokenConfig = tokenConfig;
-    }
+  public UserAuthService(
+      UserRepository userRepository,
+      PasswordEncoder passwordEncoder,
+      AuthenticationManager authenticationManager,
+      TokenConfig tokenConfig) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.authenticationManager = authenticationManager;
+    this.tokenConfig = tokenConfig;
+  }
 
-    public LoginResponse login(LoginRequest request) {
+  public LoginResponse login(LoginRequest request) {
 
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                );
+    UsernamePasswordAuthenticationToken authToken =
+        new UsernamePasswordAuthenticationToken(request.email(), request.password());
 
-        Authentication authentication = authenticationManager.authenticate(authToken);
+    Authentication authentication = authenticationManager.authenticate(authToken);
 
-        User user = (User) authentication.getPrincipal();
-        String token = tokenConfig.generateToken(user);
+    User user = (User) authentication.getPrincipal();
+    String token = tokenConfig.generateToken(user);
 
-        return new LoginResponse(token);
-    }
+    return new LoginResponse(token);
+  }
 
-    public RegisterUserResponse register(RegisterUserRequest request) {
-        User newUser = new User();
-        newUser.setName(request.name());
-        newUser.setEmail(request.email());
-        newUser.setPassword(passwordEncoder.encode(request.password()));
+  public RegisterUserResponse register(RegisterUserRequest request) {
+    User newUser = new User();
+    newUser.setName(request.name());
+    newUser.setEmail(request.email());
+    newUser.setPassword(passwordEncoder.encode(request.password()));
 
-        userRepository.save(newUser);
+    userRepository.save(newUser);
 
-        return new RegisterUserResponse(
-                newUser.getName(),
-                newUser.getEmail()
-        );
-    }
+    return new RegisterUserResponse(newUser.getName(), newUser.getEmail());
+  }
 }
