@@ -5,11 +5,11 @@ Este projeto faz parte do MVP do ChurnInsight, desenvolvido durante um hackathon
 
 # 📌 Objetivo
 
-* Disponibilizar um endpoint HTTP que:
-* receba dados de um cliente via JSON;
-* valide as informações recebidas;
-* retorne uma previsão de churn (Vai cancelar ou Vai continuar);
-* inclua a probabilidade associada à previsão.
+Disponibilizar um endpoint HTTP que:
+* Receba dados de um cliente via JSON;
+* Valide as informações recebidas;
+* Retorne uma previsão de churn (Vai cancelar ou Vai continuar);
+* Inclua a probabilidade associada à previsão.
 
 # ⚠️ Neste estágio, a previsão é mockada.
 A integração com o modelo de Data Science será feita em uma etapa posterior.
@@ -175,8 +175,8 @@ Recebe dados de um cliente e retorna a previsão de churn.
 }
 ```
 A API retorna erro 400 quando:
-* algum campo obrigatório não é informado;
-* o tipo do campo é inválido.
+* Algum campo obrigatório não é informado;
+* O tipo do campo é inválido.
 
 # 🧪 Exemplos de uso
 Exemplo 1 – Cliente com risco de churn
@@ -212,16 +212,16 @@ Resposta:
   "probabilidade": 0.12
 }
 ```
-# 🔌 Integração com Data Science (Futuro)
+# 🔌 Integração com Data Science
 
 A API foi projetada para integrar com um microserviço de Data Science responsável por:
 
-* carregar o modelo preditivo;
-* receber dados do cliente;
-* retornar a previsão e probabilidade.
+* Carregar o modelo preditivo;
+* Receber dados do cliente;
+* Retornar a previsão e probabilidade.
 * Essa integração poderá ocorrer via:
-* HTTP (FastAPI/Flask);
-* ou carregamento de modelo serializado (ex.: ONNX).
+  * HTTP (FastAPI/Flask);
+  * Ou carregamento de modelo serializado (ex.: ONNX).
 
 # 📄 Status do projeto
 
@@ -229,6 +229,6 @@ A API foi projetada para integrar com um microserviço de Data Science responsá
 - [x] Endpoint /predict
 - [x] Validação de entrada
 - [x] Contrato fechado e documentado
-- [ ] Integração com modelo de Data Science
-- [ ] Persistência de previsões
-- [ ] Dockerização
+- [x] Integração com modelo de Data Science
+- [x] Persistência de previsões
+- [x] Dockerização
