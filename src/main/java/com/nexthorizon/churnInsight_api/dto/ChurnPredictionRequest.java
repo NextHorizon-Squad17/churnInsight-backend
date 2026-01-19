@@ -10,6 +10,6 @@ import lombok.Data;
 public class ChurnPredictionRequest {
 
   @NotNull
-  @JsonProperty("CustomerID")
+  @JsonProperty("customer_id")
   private String customerId;
 }
